@@ -9,6 +9,65 @@
 3. 그 사람을 위해 일하고 싶을 때 그 사람을 채용한다. - 마크 주커버그
 4. 아무것도 하지 않는 시간이 중요하다.
 
+## Bash
+
+- 내가 자주 쓰는 명령
+```bash
+# 깨진 심볼릭 링크 찾기
+find . -type l ! -exec test -e {} \; -print
+
+# 특정 라이브러리의 설치 여부 확인
+rpm -qa | grep -i glibc
+
+# 공유 라이브러리 확인
+ldconfig -p | grep -i libstdc
+
+# 바이너리가 어떤 라이브러리를 사용하는지 확인
+ldd /path/to/binary
+objdump -p /path/to/binary | grep NEEDED
+```
+
+## Docker
+
+- 내가 자주 쓰는 명령
+```bash
+# Dangling 이미지 삭제
+docker image prune
+
+# 이미지에 터미널로 접속
+docker run -it -rm image-name:version bash
+```
+
+## Git
+
+- 내가 자주 쓰는 명령
+```bash
+# 커밋 이력을 한 줄로 표시
+# -%h  : 짧은 커밋 해시
+# -%s  : 커밋 메시지 제목만
+# -%an : 커미터 이름
+# -%ae : 커미터 이메일
+git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] [--until="2023-12-31"]
+```
+
+## Linux
+
+- UID, GID
+  - 대부분의 리눅스 배포판에서 시스템 사용자/그룹은 1~999, 일반 사용자/그룹은 1000 이상
+  - 시스템 사용자/그룹은 로그인이 불가능하거나 홈디렉토리가 없는 등 서비스 실행을 위한 목적을 가진다.
+  - 숫자 범위로 시스템 사용자/그룹과 일반 사용자/그룹을 명확히 구분하고 관리할 수 있다.
+- libc
+  - C 표준 라이브러리
+  - malloc, free, fopen, fread 등 시스템에 필요한 기본적인 기능을 제공한다.
+  - 주요 libc 구현체
+    - musl (Alpine Linux)
+      - 수 백 KB 수준의 작은 크기
+      - 메모리 사용량이 적다.
+    - glibc (GNU C Library)
+      - 수 MB에 달하는 크기
+      - 대부분의 리눅스 배포판에서 기본으로 사용
+      - 넓은 호환성, 많은 최적화, 널리 테스트되는 등의 장점을 갖는다.
+
 ## Java
 
 - JSR (Java Specification Request)
@@ -93,8 +152,31 @@
   - 특정 벤더 종속을 피할 수 있다.
   - MicroProfile 구현체와 혼용하여 마이크로서비스 개발에도 이용할 수 있으며 Spring보다 빠른 실행을 보이기도 한다.
 
+## Maven
+
+- 내가 자주 쓰는 명령
+```bash
+# 모든 의존성 출력
+mvn dependency:tree
+
+# 특정 의존성만 지정해서 출력
+mvn dependency:tree -Dincludes=com.sun.jersey:*
+
+# 모든 프로필 출력
+mvn help:all-profiles
+```
+
 ## MicroProfile
 
 - Quarkus (Red Hat) - 가장 인기 (단, 모든 스펙을 다 구현하지 않았는데 대신 가볍고 빠르다)
 - Open Liberty (IBM) - Jakarta EE, MicroProfile 모두 구현했고 TCK를 통과했다
 - Helidon (Oracle)
+
+## SQL
+
+- Anti Join보다 Not In이나 Not Exists가 낫다.
+  - 데이터 베이스가 지원을 하지 않을 수 있다.
+  - NULL 처리가 애매하다.
+  - 조인에 사용되는 키에 인덱스가 없다면 느릴 수 있다.
+  - Not In, Not Exists가 더 자주 사용되어 익숙하고 최적화가 잘 된다.
+ 
