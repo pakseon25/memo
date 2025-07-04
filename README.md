@@ -19,6 +19,9 @@
 - 주요 스펙들
   - 웹 기술
     - Servlet (JSR-315)
+      - Java로 작성된 서버 프로그램을 위한 스펙이다.
+      - doGet(), doPost(), doDelete() 등의 메서드를 오버라이드하게 된다.
+      - Tomcat, Jetty같은 서블릿 컨테이너에서 실행할 수 있다.
     - JAX-RS (JSR-311/339) - RESTful 웹 서비스 : `@Path(...)`, `@GET`, ...
     - JAX-WS (JSR-224) - SOAP 웹 서비스
     - JSF (JSR-314) - 웹 UI 프레임워크
@@ -40,6 +43,9 @@
 - 개별 스펙 구현체들
   - JAX-RS
     - Jersey (Oracle)
+      - `@Get`, `@Put`같은 어노테이션 기반으로 REST API를 개발할 수 있게 해준다.
+      - `@Path`로 URL 경로를 지정할 수 있다.
+      - Json, XML로 된 데이터를 자동으로 변환해준다.
     - RESTEasy (Red Hat)
     - Apache CXF (Apache)
   - JPA
@@ -52,6 +58,8 @@
   - Servlet
     - Tomcat (Apache)
     - Jetty (Eclipse)
+      - 경량화된 서블릿 컨테이너다.
+      - 임베디드 형태로 애플리케이션에 포함시킬 수 있다.
     - Undertow (Red Hat)
 - 개별 스펙 구현체의 장단점
   - 각 스펙마다 다른 구현체를 선택해야 한다.
