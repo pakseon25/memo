@@ -9,6 +9,20 @@
 3. 그 사람을 위해 일하고 싶을 때 그 사람을 채용한다. - 마크 주커버그
 4. 아무것도 하지 않는 시간이 중요하다.
 
+## Java
+
+- JSR (Java Specification Request)
+  - JSR-305 (Annotations for Software Defect Detection)
+    - 정적 코드 분석 도구를 위한 어노테이션 모음
+    - 표준화는 실패했지만 널리 사용되고 있다.
+    - `@Nullable`, `Nonnull`, `@CheckForNull`, ...
+  - JSR-250 (Common Annotations)
+    - 생명 주기 관리와 보안 관련 어노테이션 모음
+  - JSR-330 (Dependency Injection for Java)
+    - Google Guice, Spring, Dagger 등의 구현체가 있다.
+    - 구현체끼리 교체가 쉽지는 않다.
+  - JSR-310 (Date and Time API)
+
 ## Jakarta EE (구 Java EE)
 
 - 오라클이 정의한 표준 스펙들의 집합으로, 실제 구현체가 아닌 "이렇게 만들어야 한다"는 설계도
