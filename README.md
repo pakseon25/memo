@@ -206,3 +206,364 @@ mvn help:all-profiles
   - 조인에 사용되는 키에 인덱스가 없다면 느릴 수 있다.
   - Not In, Not Exists가 더 자주 사용되어 익숙하고 최적화가 잘 된다.
  
+## React
+
+### 컴포넌트
+- no props
+```typescript
+function UserList() {
+  return (
+    <div>
+      <h2>사용자 목록</h2>
+      <p>여기에 사용자들이 표시됩니다</p>
+    </div>
+  );
+}
+```
+
+- with props
+```typescript
+function UserCard({ user }) {
+  return (
+    <div className="user-card">
+      <h3>{user.name}</h3>
+      <p>이메일: {user.email}</p>
+      <p>가입일: {user.createdAt}</p>
+    </div>
+  );
+}
+```
+
+- React fragment
+
+React 컴포넌트는 여러 개의 HTML 요소를 반환할 때, 반드시 하나의 부모 요소로 감싸야 한다는 규칙이 있다. 예전에는 불필요한 `<div>` 태그로 감싸야만 했다. **Fragment (<>...</>)**는 이렇게 불필요한 태그를 생성하지 않고, 여러 요소를 하나로 묶어주는 역할을 하는 '투명한' 포장지 같은 것이다. 실제 웹페이지의 HTML 구조에는 아무런 영향을 주지 않아 더 깔끔하고 효율적이다.
+
+```typescript
+function UserCard({ user }) {
+  return (
+    <>
+      <h1>Hello</h1>
+      <p>This is React Demo</p>
+    </>    
+  );
+}
+```
+
+### export
+
+- default export
+  - 파일(모듈)에서 대표가 되는 단 하나만 내보낼 때 사용한다
+  - 가져올 때(import) 중괄호 {} 없이 원하는 이름으로 가져올 수 있다. (예: `import Main from './App'`)
+  - 주로 React 컴포넌트에서 사용
+
+```typescript
+// utils.ts
+function calculateTotal(items) {
+  return item.reduce((sum, item) => sum + item.price, 0);
+}
+
+export default calculateTotal;
+
+// App.ts
+import calculateTotal from './utils';
+// 또는 다른 이름으로 가져오기 가능
+import calc from './utils';
+import anyName from './utils';
+```
+
+- named export
+  - 파일에서 여러 개를 내보낼 때 사용한다.
+  - 가져올 때(import) 반드시 중괄호 {} 안에 원래 이름 그대로 사용해야 한다. (예: `import { MyButton, MyInput } from './components'`)
+  - 유틸리티 함수, 상수 등에서 주로 사용
+
+```typescript
+// helpers.ts
+export function formatPrice(price) {
+  return `\${price.toLocaleString()}`;
+}
+
+export function formatDate(date) {
+  return date.toLocaleDateString('ko-KR');
+}
+
+const DISCOUNT_RATE = 0.15
+
+export { formatPrice, formatDate, DISCOUNT_RATE };
+
+// api.ts
+import { formatPrice, formatDate, DISCOUNT_RATE } from './helpers'
+```
+
+### React Hook
+
+**React Hook(훅)**은 함수형 컴포넌트에서 React의 핵심 기능(예: 상태 관리, 생명주기)을 "걸어서(hooking)" 사용할 수 있게 해주는 특별한 함수다.
+
+과거에는 상태를 관리하려면 복잡한 '클래스 컴포넌트'를 사용해야만 했다. 하지만 Hook이 도입된 이후로는 간결한 '함수형 컴포넌트' 내에서 useState, useEffect 같은 Hook을 사용하여 상태를 만들고 데이터를 불러오는 등 다양한 작업을 할 수 있게 되었다.
+
+Hook은 항상 use로 시작하는 이름을 가지며(useState, useEffect, useContext 등), React의 기능을 함수 안으로 가져오는 역할을 한다.
+
+- 상태 관리 (useState)
+
+```typescript
+import { useState } from 'react';
+
+function DataTable() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState('');
+
+  const adduser = (newUser) => {
+    setUsers([...users, newUser]);
+  };
+
+  const deleteUser = (userId) => {
+    setUsers(users.filter(user => user.id !== userid))
+  }
+
+  return (
+    <div>
+      <input type="text"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        placeholder="이름으로 검색..."
+      />
+
+      {loading ? (
+        <p>로딩 중...</p>
+      ) : (
+        <div>
+          {users.filter(user => user.name.includes(filter))
+                .map(user => (<UserCard key={user.id} user={user} />))
+          }
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+- API 호출 (useEffect)
+
+```typescript
+import { useState, useEffect } from 'react';
+
+function Dashboard() {
+  const [stats, setStats] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // 컴포넌트 마운트 시 데이터 로드
+    loadDashboardData();
+  }, []); // 빈 배열. 한 번만 실행
+
+  const loadDashboardData = async() () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/dashboard');
+      const data = await response.json();
+      setStats(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (error) return <div>오류: {error}</div>;
+  if (!stats) return <div>로딩 중...</div>;
+
+  return (
+    <div>
+      <h1>대시보드</h1>
+      <div>총 사용자: {stats.totalUsers}</div>
+      <div>오늘 가입: {stats.todaySignups}</div>
+    </div>
+  );
+}
+```
+
+- useCallback
+
+### 폼 처리
+
+```typescript
+function CreateUserForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: 'user'
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fech('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert('사용자 생성 완료');
+        setFormData({ name: '', email: '', role: 'user' });
+      }
+    } catch (err) {
+      alert('오류 발생: ' + error.message);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>이름:</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleCange}
+          required
+        />
+      </div>
+
+      <div>
+        <label>이메일:</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleCange}
+          required
+        />
+      </div>
+
+      <div>
+        <label>역할:</label>
+        <select name="role" value={formData.role} onChange={handleChange}>
+          <option value="user">사용자</option>
+          <option value="admin">관리자</option>
+        </select>
+      </div>
+
+      <button type="submit">생성</button>
+    </form>
+  )
+}
+```
+
+### 간단한 라우팅 (react-router)
+
+```typescript
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">대시보드</Link>
+        <Link to="/users">사용자 관리</Link>
+        <Link to="/logs">로그</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/logs" element={<LogViewer />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+### 조건부 렌더링 & 리스트
+
+```typescript
+function AdminPanel({ user }) {
+  return (
+    <div>
+      {user.isAdmin && (
+        <div>
+          <h3>관리자 메뉴</h3>
+          <button>시스템 설정</button>
+        </div>
+      )}
+
+      <div>
+        <h3>최근 활동</h3>
+        {user.activities.length === 0 ? (
+          <p>활동이 없습니다</p>
+        ) : (
+          <ul>
+            <user.activities.map(activity => (
+              <li key={activity.id}>
+                {activity.type}: {activity.description}
+              </li>
+            ))>
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+### 커스텀 훅
+
+```typescript
+// 데이터 페칭 훅
+function useApi(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const refetch = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setERror(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refetch();
+  }, [url]);
+
+  return { data, loading, erro, refetch };
+}
+
+// 사용법
+function UserList() {
+  const { data: users, loading, error, refetch } = useApi('/api/users');
+
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>오류: {error}</div>;
+
+  return (
+    <div>
+      <button onClick={refetch}>새로고침</button>
+      {users?.map(user => (
+        <UserCard key={user.id} user={user} />
+      ))}
+    </div>
+  );
+}
+```
+
+### Recoil
