@@ -101,6 +101,10 @@ objdump -p /path/to/binary | grep NEEDED
 - CDPATH
 - pushd, popd, dirs, dirs -p, dirs -v
 
+## ClickHouse
+
+- Initially, a custom database driver was written for ClickHouse, but we ended up switching to the excellent ch-go low level library, which directly reads Blocks from ClickHouse in a columnar format. This had a dramatic effect on performance in comparison to the standard Go driver. Combined with the framework optimisations above, we now ingest millions of rows per second with a single ClickHouse connection. (https://blog.cloudflare.com/building-jetflow-a-framework-for-flexible-performant-data-pipelines-at-cloudflare/)
+
 ## Docker
 
 - 내가 자주 쓰는 명령
