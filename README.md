@@ -74,6 +74,10 @@
 (후략)
 ```
 
+## Apache Hudi
+
+- Viewed through the lens of the RUM Conjecture - which states that optimizing for two of Read, Update, and Memory inevitably requires trading off the third. CoW and MoR emerge as two natural design responses to the trade-offs in lakehouse table formats: (https://hudi.apache.org/blog/2025/07/21/mor-comparison/)
+
 ## Bash
 
 - 내가 자주 쓰는 명령
