@@ -77,6 +77,8 @@
 ## Apache Hudi
 
 - Viewed through the lens of the RUM Conjecture - which states that optimizing for two of Read, Update, and Memory inevitably requires trading off the third. CoW and MoR emerge as two natural design responses to the trade-offs in lakehouse table formats: (https://hudi.apache.org/blog/2025/07/21/mor-comparison/)
+- Copy-on-Write tables optimize for read performance. They rewrite Parquet files entirely when a change is made, ensuring clean, columnar files with no extra merge logic at query time. This suits batch-style, read-optimized analytics workloads where write frequency is low.
+- Merge-on-Read, in contrast, introduces flexibility for write-intensive and latency-sensitive workloads by avoiding expensive writes. Instead of rewriting files for every change, MoR tables store updates in delta logs (Hudi), delete files (Iceberg V2), or deletion vectors (Delta Lake). Reads then stitch together the base data files with these changes to present an up-to-date view. This tradeoff favors streaming or near real-time workloads where low write latency is critical.
 
 ## Bash
 
