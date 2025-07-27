@@ -74,6 +74,16 @@
 (후략)
 ```
 
+## Expert Generalist
+
+```
+(전략)
+
+We've always felt that such desires are wrong-headed. The characteristics that we've observed separating effective software developers from the chaff aren't things that depend on the specifics of tooling. We rather appreciate such things as: the knowledge of core concepts and patterns of programming, a knack for decomposing complex work-items into small, testable pieces, and the ability to collaborate with both other programmers and those who will benefit from the software.
+
+(후략)
+```
+
 ## Apache Hudi
 
 - Viewed through the lens of the RUM Conjecture - which states that optimizing for two of Read, Update, and Memory inevitably requires trading off the third. CoW and MoR emerge as two natural design responses to the trade-offs in lakehouse table formats: (https://hudi.apache.org/blog/2025/07/21/mor-comparison/)
