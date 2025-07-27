@@ -81,7 +81,8 @@
 
 We've always felt that such desires are wrong-headed. The characteristics that we've observed separating effective software developers from the chaff aren't things that depend on the specifics of tooling. We rather appreciate such things as: the knowledge of core concepts and patterns of programming, a knack for decomposing complex work-items into small, testable pieces, and the ability to collaborate with both other programmers and those who will benefit from the software.
 
-Jackie Stewart, a triple Formula 1 world champion (1969-93), described how, while he wasn't an engineer of the cars he drove, he still needed a sense of how they worked, how they responded to what the driver was trying to do, a sense he called mechanical sympathy. Martin Thompson brought this concept into software, by talking about how a similar knowledge of how computer hardware works is vital to writing high-performance software.
+We think that the notion of mechanical sympathy has a broader sense in software, in that we do need to cultivate such a sympathy for any adjacent domain to the ones we are working on. When working on a database design, we need such a sympathy for the user-interface so we can construct a design that will work smoothly with the user-experience. A user-experience designer needs such a sympathy with software constraints so when choosing between similarly valuable user flows, they take into account how hard it is to build them.
+
 (후략)
 ```
 
