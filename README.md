@@ -17,6 +17,7 @@
 
 1. 라이브 서비스의 데이터를 처리하는 경우 어뷰징, DDoS로 데이터양이 폭증할 수 있으므로 이에 대한 대응책이 있어야 한다.
 1. Designing for large scale can be deferred by setting the right expectations with customers, and by adding guardrails like product limits and rate limits. Focusing on launching initial versions of products with just a few essential parts, maybe two or three components, gives us something to ship, test, and learn from quickly. We can always add complexity later, but only once it’s clear we need it. (https://blog.cloudflare.com/timescaledb-art/)
+1. Unlike most traditional SQL databases, Impala eschews these exhaustive search query optimization strategies to simplify query planning. This is an emerging trend adopted by several database systems including Google’s F1 and Youtube’s Procella, which take a similar non-exhaustive approach to query optimization. This means that small queries can be planned quickly, avoiding situations where it takes longer to plan a query than to execute it. Impala’s planner simplifies planning in several ways. (https://www.cloudera.com/blog/technical/keeping-small-queries-fast-short-query-optimizations-in-apache-impala.html)
 
 ## 좋은 글에서 발췌
 
