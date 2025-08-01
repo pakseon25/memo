@@ -291,6 +291,48 @@ mvn help:all-profiles
   - PEP 621 지원
     - 여러 곳에 흩어진 프로젝트 메타데이터를 pyproject.toml 파일 하나에 다 모으는 표준 스키마를 제정했다.
     - PDM, Hatch 등은 PEP 621을 완벽히 지원한다.
+  - 사용법
+  ```bash
+  mkdir my-project
+  cd my-project
+
+  pdm init
+
+  # 기본 의존성 추가
+  pdm add fastapi uvicorn
+
+  # 개발 의존성 추가
+  pdm add -dG dev pytest black isort mypy
+
+  # 특정 그룹으로 의존성 추가
+  pdm add -dG test pytestcov pytest-asyncio
+
+  # 의존성 보기
+  pdm list
+  pdm list --tree
+
+  # 의존성 정보 보기
+  pdm info fastapi
+
+  # 개발 코드 작성
+  mkdir -p src/my-project
+  touch src/my-project/main.py
+
+  # 테스트 코드 작성
+  mkdir -p tests/my-project
+
+  # 개발 서버 실행
+  pdm run start
+
+  # 테스트 실행
+  pdm run test
+
+  # 의존성 업데이트
+  pdm update
+
+  # 캐시 정리
+  pdm cache clear
+  ```
 
 ## SQL
 
