@@ -702,4 +702,24 @@ function UserList() {
 }
 ```
 
-### Recoil
+### VS Code
+
+- 단축키
+  - 파일 및 탐색
+    - Ctrl + P - 파일 빠르게 열기
+    - Ctrl + Shift + P - 명령 팔레트 열기
+    - Ctrl + B - 사이드바 토글
+    - Ctrl + ` - 터미널 토글
+  - 편집
+    - Ctrl + D - 같은 단어 다중 선택
+    - Alt + Click - 다중 커서
+    - Ctrl + / - 주석 토글
+    - Alt + 위/아래 - 줄 이동
+    - Shift + Alt + 위/아래 - 줄 복사
+  - 코드
+    - Ctrl + Shift + O - 심볼로 이동
+    - F12 - 정의로 이동
+    - Alt + F12 - 정의 미리보기
+  - 기타
+    - Ctrl + Shift + E - 파일 탐색기 포커스
+    - Ctrl + 1 - 첫 번째 에디터 포커스
