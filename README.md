@@ -284,6 +284,13 @@ mvn help:all-profiles
 
 - Context Manager
   - `__enter__`, `__exit__`을 구현하면 된다.
+- 패키지 관리: PDM
+  - PEP 582 지원
+    - 기존에 사용하던 venv, virtualenv는 번거롭고 가상환경을 활성화하는 것을 잊기 쉽다.
+    - PEP 582는 node_modules처럼 `__pypackages__` 폴더를 만들어서 패키지를 관리하는 프로젝트 로컬 패키지 개념을 도입했다.
+  - PEP 621 지원
+    - 여러 곳에 흩어진 프로젝트 메타데이터를 pyproject.toml 파일 하나에 다 모으는 표준 스키마를 제정했다.
+    - PDM, Hatch 등은 PEP 621을 완벽히 지원한다.
 
 ## SQL
 
