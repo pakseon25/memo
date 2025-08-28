@@ -245,11 +245,31 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
   - 가비지 컬렉션 사이클
     - Young-only phase
       - 일반적인 Young collection과 같음
+      - Young generation의 region과 Humongous region만 회수한다.
       - Old generation이 Initiating Heap Occupancy threshold를 넘어서면 Space reclamation phase로 전환 시작
       - Concurrent start : 일반적인 Young collection과 보존할 Old generation marking을 동시에 수행
       - Remark
+        - Snapshot-At-The-Beginning
+        - It takes a virtual snapshot of the heap at the time of the Initial Mark pause, when all objects that were live at the start of marking are considered live for the remainder of marking. This means that objects that become dead (unreachable) during marking are still considered live for the purpose of space-reclamation (with some exceptions). This may cause some additional memory wrongly retained compared to other collectors. However, SATB potentially provides better latency during the Remark pause. The too conservatively considered live objects during that marking will be reclaimed during the next marking.
       - Cleanup
-   - Space reclamation phase
+    - Space reclamation phase
+      - Young generation region, Humoungous region에 더해 Old generation regiom을 회수한다.
+  - G1 GC는 non-humongous region은 eden에서 survivor, survivor에서 old로 복사한다.
+  - G1 GC는 humongous region은 더 이상 사용하지 않으면 회수하고, 아직 사용 중이면 그대로 둔다.
+  - Collection set : 회수할 리전들
+  - 주요 플래그들
+    - -XX:G1PeriodicGCInterval
+    - -XX:NewSize
+    - -XX:MaxNewSize
+    - -XX:InitiatingHeapOccupancyPercent
+    - -XX:-G1UseAdaptiveIHOP
+  - Evacuation failure
+  - Humoungous object
+    - region 크가의 절반 이상인 객체
+    - Cleanup pause나 Full GC에서만 회수된다.
+    - -XX:G1EagerReclaimHumongousObjects : Humongous object가 원시 타입의 배열이라면 어느 단계에서든 회수를 시도한다.
+    - Humongous object 할당할 때마다 IHOP을 확인한다.
+    - 
 
 ## Jakarta EE (구 Java EE)
 
