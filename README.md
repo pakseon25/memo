@@ -243,8 +243,13 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
     - 실시간 수집기가 아니므로 설정된 일시 중지 시간 목표를 더 긴 시간 동안 높은 확률로 충족시키려 시도하지만, 특정 일시 중지에 대해 항상 절대적인 확신을 가지고 달성하는 것은 아닙니다.
     - 애플리케이션은 항상 젊은 세대, 즉 에덴 영역에 할당합니다. 단, 거대한 객체는 예외로 하여 직접 노년 세대에 속하는 것으로 할당됩니다.
   - 가비지 컬렉션 사이클
-    - Young only phase
-    - 
+    - Young-only phase
+      - 일반적인 Young collection과 같음
+      - Old generation이 Initiating Heap Occupancy threshold를 넘어서면 Space reclamation phase로 전환 시작
+      - Concurrent start : 일반적인 Young collection과 보존할 Old generation marking을 동시에 수행
+      - Remark
+      - Cleanup
+   - Space reclamation phase
 
 ## Jakarta EE (구 Java EE)
 
