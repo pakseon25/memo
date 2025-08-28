@@ -236,6 +236,23 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
     - Google Guice, Spring, Dagger 등의 구현체가 있다.
     - 구현체끼리 교체가 쉽지는 않다.
   - JSR-310 (Date and Time API)
+- Module
+  - 목표
+    - 단일 통합 런타임 rt.jar의 종말
+    - JDK 내부 구성 요소의 적절한 캡슐화 및 보호
+  - 모듈 그래프
+    - module-info.java (Module descriptor)에 명시된 모듈 의존성은 컴파일러와 런타임이 신뢰할 수 있다
+  - module-info.java
+    - exports <패키지이름> : 어떤 패키지가 모듈의 공용 API로 간주되는지를 나타내기 위한 키워드
+    - exports <패키지이름> to ...
+    - requires <모듈이름>
+  - jmod describe $JAVA_HOME/jmods/java.base.jmod
+  - jimage list $JAVA_HOME/lib/modules
+  - 전이성
+    - 전이성이란 모듈 A가 모듈 B를 요구하고, 모듈 B가 모듈 C를 요구할 때, 모듈 A가 자동으로 모듈 C에도 접근할 수 있게 되는 의존성 전파 메커니즘이다.
+    - A가 C의 API를 직접 사용하지 않고 B만 사용한다면, A는 C를 requires할 필요가 없다.
+    - 이처럼 자바 모듈 시스템에서는 기본적으로 직접 선언한 의존성만 사용할 수 있으며, 전이적 의존성을 사용하려면 `requires transitive` 키워드를 통해 명시적으로 re-export해야 한다.
+    - 캡슐화와 의존성 관리를 위해 transitive는 꼭 필요한 경우(API에서 다른 모듈의 타입을 노출하는 경우)에만 사용하는 것이 좋다.
 - G1 GC
   - 목표 : 예측 가능한 중지 시간 목표를 설정하여 수백 밀리초를 초과하지 않도록 하고, 긴 가비지 컬렉션 중지를 방지합니다.
   - 활성화 : -XX:+UseG1GC
@@ -269,7 +286,7 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
     - Cleanup pause나 Full GC에서만 회수된다.
     - -XX:G1EagerReclaimHumongousObjects : Humongous object가 원시 타입의 배열이라면 어느 단계에서든 회수를 시도한다.
     - Humongous object 할당할 때마다 IHOP을 확인한다.
-    - 
+    
 
 ## Jakarta EE (구 Java EE)
 
@@ -801,6 +818,9 @@ function UserList() {
     - Ctrl + Shift + O - 심볼로 이동
     - F12 - 정의로 이동
     - Alt + F12 - 정의 미리보기
+    - F5 - Debugging
+    - Ctrl + F5 - Run without debugging
   - 기타
     - Ctrl + Shift + E - 파일 탐색기 포커스
     - Ctrl + 1 - 첫 번째 에디터 포커스
+    - Ctrl + Alt + I - 코파일럿 포커스
