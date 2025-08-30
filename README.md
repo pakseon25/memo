@@ -254,14 +254,31 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
     - 이처럼 자바 모듈 시스템에서는 기본적으로 직접 선언한 의존성만 사용할 수 있으며, 전이적 의존성을 사용하려면 `requires transitive` 키워드를 통해 명시적으로 re-export해야 한다.
     - 캡슐화와 의존성 관리를 위해 transitive는 꼭 필요한 경우(API에서 다른 모듈의 타입을 노출하는 경우)에만 사용하는 것이 좋다.
 - G1 GC
-  - 목표 : 예측 가능한 중지 시간 목표를 설정하여 수백 밀리초를 초과하지 않도록 하고, 긴 가비지 컬렉션 중지를 방지합니다.
+  - 참고 자료
+    - https://www.oracle.com/technetwork/tutorials/tutorials-1876574.html
+    - https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-garbage-collector1.html
+    - https://www.oracle.com/technical-resources/articles/java/g1gc.html
+    - https://www.redhat.com/en/blog/part-1-introduction-g1-garbage-collector
+    - https://www.redhat.com/en/blog/collecting-and-reading-g1-garbage-collector-logs-part-2
+  - 목표
+    - 예측 가능한 중지 시간 목표를 설정하여 수백 밀리초를 초과하지 않도록 하고, 긴 가비지 컬렉션 중지를 방지합니다.
+    - At its heart, the goal of the G1 collector is to achieve a predictable soft-target pause time, defined through -XX:MaxGCPauseMillis, while also maintaining consistent application throughput.
+    - A general rule with G1 is that the higher the pause time target, the achievable throughput, and overall latency become higher. The lower the pause time target, the achievable throughput and overall latency become lower.
   - 활성화 : -XX:+UseG1GC
   - 특징
+    - 위에서 G1의 새로운 개념인 '영역(region)'에 대해 언급했습니다. 간단히 말해, 영역은 할당된 공간 블록을 나타내며, 동일한 세대의 다른 영역과 연속성을 유지할 필요 없이 모든 세대의 객체를 수용할 수 있습니다. G1에서는 기존의 젊은 세대(Young generation)와 노년 세대(Tenured generation)가 여전히 존재합니다. 젊은 세대는 새로 할당된 모든 객체가 시작되는 에덴 공간(Eden space)과, 수집 과정에서 살아있는 에덴 객체가 복사되는 생존자 공간(Survivor space)으로 구성됩니다. 객체는 수거되거나 XX:MaxTenuringThreshold(기본값 15)로 정의된 충분한 연령에 도달하여 승격될 때까지 생존자 공간에 남아 있습니다. 노년 세대는 생존자 공간에서 XX:MaxTenuringThreshold에 도달한 객체가 승격되는 노년 공간으로 구성됩니다. 물론 이에 대한 예외가 있으며, 이는 글 후반부에 다루겠습니다. 이 영역 크기는 JVM 시작 시 계산 및 정의됩니다. 가능한 한 2048개에 가까운 영역을 가지는 원칙에 기반하며, 각 영역 크기는 1~64MB 사이의 2의 거듭제곱 단위로 설정됩니다.
+    - When setting the region size, it’s important to understand the number of regions your heap-to-size ratio will create because the fewer the regions, the less flexibility G1 has and the longer it takes to scan, mark and collect each of them.
+    - When the aforementioned young collection takes place, dead objects are collected and any remaining live objects are evacuated and compacted into the Survivor space. G1 has an explicit hard-margin, defined by the G1ReservePercent (default 10%), that results in a percentage of the heap always being available for the Survivor space during evacuation.
+    - When young collection occurs
+      - It reaches a configurable soft-margin known as the InitiatingHeapOccupancyPercent (IHOP).
+      - It reaches its configurable hard-margin (G1ReservePercent)
+      - It encounters a humongous allocation (this is the exception I referred to earlier, more on this at the end).
     - 실시간 수집기가 아니므로 설정된 일시 중지 시간 목표를 더 긴 시간 동안 높은 확률로 충족시키려 시도하지만, 특정 일시 중지에 대해 항상 절대적인 확신을 가지고 달성하는 것은 아닙니다.
     - 애플리케이션은 항상 젊은 세대, 즉 에덴 영역에 할당합니다. 단, 거대한 객체는 예외로 하여 직접 노년 세대에 속하는 것으로 할당됩니다.
   - 가비지 컬렉션 사이클
     - Young-only phase
-      - 일반적인 Young collection과 같음
+      - 일반적인 Young collection과 같다. eden의 live 객체는 survivor로 evacuated된다. 그러다 threshold를 만족하면 old로 승격된다.
+      - 이 단계는 Stop-the-world다.
       - Young generation의 region과 Humongous region만 회수한다.
       - Old generation이 Initiating Heap Occupancy threshold를 넘어서면 Space reclamation phase로 전환 시작
       - Concurrent start : 일반적인 Young collection과 보존할 Old generation marking을 동시에 수행
@@ -270,7 +287,21 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
         - It takes a virtual snapshot of the heap at the time of the Initial Mark pause, when all objects that were live at the start of marking are considered live for the remainder of marking. This means that objects that become dead (unreachable) during marking are still considered live for the purpose of space-reclamation (with some exceptions). This may cause some additional memory wrongly retained compared to other collectors. However, SATB potentially provides better latency during the Remark pause. The too conservatively considered live objects during that marking will be reclaimed during the next marking.
       - Cleanup
     - Space reclamation phase
-      - Young generation region, Humoungous region에 더해 Old generation regiom을 회수한다.
+      - Young generation region, Humoungous region에 더해 Old generation region을 회수한다.
+    - G1 old collection - Concurrent marking cycle phases
+      1. initial mark (STW) : old에 참조를 갖는 survivor region을 mark한다.
+      1. root region scanning : old에 참조를 갖는 survivor region을 scan한다. STW가 아니다.
+      1. concurrent marking
+        - 모든 힙에서 live 객체를 찾는다.
+        - evacuation 단계에서 어떤 region을 회수하는 것이 최선일지 알아내기 위한 liveness를 계산한다.
+      1. remark (STW)
+        - Snapshot-at-the-beginning 알고리즘으로 힙의 live 객체 marking을 완료한다.
+        - 모든 region에 대해 region liveness를 계산한다.
+        - 완전히 비어있는 region을 회수한다.
+      1. cleaup (STW and concurrent)
+        - region과 RSets을 정리한다. (STW)
+        - region을 free list에 등록하는데 이건 concurrent로 동작한다.
+      1. copying (STW) : G1은 liveness가 가장 낮은 region을 우선 선택해서 회수한다. live 객체를 미사용 region으로 복사한다. young generation에서만 일어나면 로그에는 "GC pause (young)"으로 남고, young과 old 모두에서 일어나면 "GC Pause (mixed)"로 로그가 남는다.
   - G1 GC는 non-humongous region은 eden에서 survivor, survivor에서 old로 복사한다.
   - G1 GC는 humongous region은 더 이상 사용하지 않으면 회수하고, 아직 사용 중이면 그대로 둔다.
   - Collection set : 회수할 리전들
@@ -286,7 +317,25 @@ git log branch-name --pretty=format:"%h - %s -%an <%ae>" [--since="2023-01-01"] 
     - Cleanup pause나 Full GC에서만 회수된다.
     - -XX:G1EagerReclaimHumongousObjects : Humongous object가 원시 타입의 배열이라면 어느 단계에서든 회수를 시도한다.
     - Humongous object 할당할 때마다 IHOP을 확인한다.
-    
+    - Humongous objects are allocated to a special humongous region directly within the Old generation. This is because the cost to evacuate and copy such an object across the young generations can be too high.
+    - Humongous allocations always trigger a concurrent marking cycle, whether the IHOP criteria is met or not.
+  - Class unloading이 필요한 이유 : 내부적으로 계속 재배포가 일어나거나 리플렉션으로 임시 클래스를 만드는 애플리케이션에서 이를 정리하지 않으면 Metaspace가 가득차게 된다.
+  - Remembered Sets (RSets) : 해당 region을 가리키는 객체 참조를 추적한다. region당 하나가 존재한다.
+  - Collection Sets (CSets) : GC에서 수집될 region 집합을 가리킨다. GC 동안 CSet의 모든 live 객체는 evacuated(copied/moved)된다.
+  - G1에서 Full GC가 발생하는 이유
+    - Metaspace full
+    - to-space exhausted
+  - 권장
+    - Young generation의 크기를 설정하지 마라 : -Xmn, -XX:NewRation 등을 사용하면 pause-time goal을 오버라이드해버린다.
+    - Pause time goals : G1 GC는 일관된 pause-time을 갖는 incremental gc지만 대신 오버헤드가 기존 gc보다 크다. 기존의 Throughput collector가 애플리케이션 실행 시간 99%, GC 시간 1%였다면 G1 GC는 pause time을 최소화하는 대신 애플리케이션 실행 시간 90%, GC 시간 10%를 목표로 한다. 그래서 pause-time을 너무 낮게 설정하면 gc 오버헤드가 커질 수 있으므로 주의가 필요하다.
+    - GC 로그에 "to-space overflow/exhausted"가 보이면 충분한 메모리가 없다는 의미이다.
+    - 튜닝이 필요하면 다음 옵션을 조정해보라
+      - `-XX:InitiatingHeapOccupancyPercent` : marking threshold
+      - `-XX:G1MixedGCLiveThresholdPercent`, `-XX:G1HeapWastePercent` : Mixed GC 관련 조정
+      - `-XX:G1MixedGCCountTarget`, `-XX:G1OldCSetRegionThresholdPercent` : old region의 CSet 조정
+  - G1 - Good Throughput, controllable latency, suitable for long lived services where heap sizes are below 16GB
+  - ZGC - Good Throughput, ultra-low latency, suitable for long lived services where heap sizes are above 4GB
+  - https://www.youtube.com/watch?v=L68zxvl2LPY에 따르면 G1은 밸런스가 좋고, Generation ZGC가 아닌 일반 ZGC는 tail latency가 커지는 문제가 있어서 Generation ZGC를 사용해야 한다.
 
 ## Jakarta EE (구 Java EE)
 
