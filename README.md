@@ -24,6 +24,7 @@
 1. 셔츠 앞에 적힌 팀의 이름을 위해서 경기를 해라. 그러면 사람들은 그 셔츠 뒤에 적힌 당신의 이름을 기억할 것이다.
 1. 학습에는 의도가 필요하다
 1. One of the real challenges here is the way that A.I. undermines the human value of attention, and the individuality that flows from that. - nytimes
+1. 혼자서 오래 글을 쓰던 사람들은 인정의 계기가 없으면 자기에 대해서 계속 의심을 하게 되잖아요. - 현호정x하미나 라이브 북토크
 
 ## 어딘가에 넣기 애매한 말
 
