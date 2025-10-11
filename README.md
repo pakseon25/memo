@@ -12,7 +12,16 @@
 * Ivy Lee 방법
   * 하루 6가지 최우선 과제를 기록하고 순서대로 처리
   * 단순하지만 강력한 우선순위 관리 기법임
-
+* 새로운 기술을 빠르고 효과적으로 배우는 4가지 방법
+  * 전문 영역 선택
+  * 목표 설정
+    * Specific
+    * Measurable
+    * Achievable
+    * Relevant
+    * Time Bound
+  * 연습
+  * Followup
 
 ## 기억하고 싶은 말
 
