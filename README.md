@@ -938,6 +938,9 @@ function UserList() {
 
 ### 사례 모음
 
+* CDC
+  * Change Log 방식 : 단순, 정확한 이력 보존, 타임 트래블을 지원하는 대신 머지가 필요하다.
+  * Uosert 방식 : 성능 영향이 커서 저용량 테이블에 적합하다.
 * DoorDash (2025)
   * v3의 deletion vector와 variant 기능을 적극 활용하고 있다.
   * orphan 파일이 많을 때 유지보수 작업이 실패하는 현상이 있어 문제 해결을 위해 노력 중
