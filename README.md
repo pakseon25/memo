@@ -942,4 +942,16 @@ function UserList() {
   * v3의 deletion vector와 variant 기능을 적극 활용하고 있다.
   * orphan 파일이 많을 때 유지보수 작업이 실패하는 현상이 있어 문제 해결을 위해 노력 중
 
-  
+
+## 데이터 플랫폼
+
+### 사례 모음
+
+* [booking.com](https://youtu.be/dY2DOYhqq3s) (2025)
+  * 클라우드, AWS 우선, Snowflake, Iceberg 우선, Snowflake 네이티브 테이블 제외하고는 S3에 저장, Glue와 Snowflake catalog 사용, 다양한 요구사항을 만족하기 위해 멀티 컴퓨터 엔진 (60% Spark, 40% DBT, 간혹 Snowpark와 Snowpark Connector), Astronomer Flow
+  * Glue, Snowflake catalog 연동 전략은 데이터를 있는 그대로 유지하고, 이동시키지 않으며, 필요할 때만 쿼리하는 제로 원칙을 따른다. 특히 페타바이트 규모의 데이터는 리전, 클라우드, 버킷 간에 이동시키지 않는다.
+  * 컴퓨팅은 Snowflake를 통해서만 실행되고 60% 이상이 컬럼 마스킹 또는 로우 레벨 정책으로 접근 제어를 하고 있다. 접근 제어에는 ABAC을 사용하는데 RBAC을 사용하면 수 만개의 정책을 생성해야 하는 문제를 피하기 위함이다.
+  * 쓰기 규칙 : 사람은 데이터를 쓰지 않고, 기계(관리되는 프로세스나 워크플로우)만 데이터를 쓴다.
+  * 규제가 심한 금융팀은 보안 뷰로 데이터를 공유하는데 Snowflake 네이티브인지 Iceberg인지는 중요하지 않으며 필요한 규정을 준수했는지 확인하기 위함이다.
+  * 민감 데이터는 반드시 Snowflake를 통해 쿼리해야 한다.
+  * 모든 엔진이 Parquet 및 Iceberg 파일을 올바르게 작성하여 읽기와 쓰기 모두에서 일관된 성능을 보장하도록 신뢰해야 한다. Iceberg 파일을 어떻게 작성하는지가 성능에 중요하기 때문이다. 파일 크기와 파일 내 통계가 매우 중요하다.
